@@ -1,0 +1,41 @@
+server:
+  port: ${SERVER_PORT:8086}
+
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:document-service}
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://banquito_mongo:BanQuitoMongo2026!@mongo-document:27017/banquito_document_db?authSource=admin}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_EXPOSURE:health,info}
+  endpoint:
+    health:
+      show-details: ${ACTUATOR_HEALTH_DETAILS:always}
+
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.banquito.platform.document: ${LOG_LEVEL_APP:INFO}
+
+banquito:
+  security:
+    jwt:
+      issuer: ${JWT_ISSUER:banquito-identity-access}
+      secret: ${JWT_SECRET:BanQuitoIdentityJwtSecretKeyForDevelopmentOnlyChangeMe2026}
+  demo:
+    enabled: ${DOCUMENT_DEMO_ENABLED:true}
+  messaging:
+    rabbitmq:
+      enabled: ${DOCUMENT_RABBITMQ_ENABLED:false}
+      exchange: ${BANQUITO_EVENTS_EXCHANGE:banquito.events.exchange}
+      documentQueue: ${DOCUMENT_QUEUE:document.queue}
+  grpc:
+    server:
+      port: ${DOCUMENT_GRPC_PORT:9096}
+  storage:
+    mode: ${DOCUMENT_STORAGE_MODE:MONGODB_PAYLOAD}
+    base-path: ${DOCUMENT_STORAGE_BASE_PATH:/documents}
