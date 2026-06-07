@@ -17,9 +17,9 @@ RUN addgroup --system banquito && adduser --system --ingroup banquito banquito
 COPY --from=build /workspace/target/document-service-0.0.1-SNAPSHOT.jar app.jar
 
 ENV SPRING_PROFILES_ACTIVE=docker
-ENV SERVER_PORT=8086
+ENV SERVER_PORT=8013
 
-EXPOSE 8086
+EXPOSE 8013
 
 USER banquito
 
