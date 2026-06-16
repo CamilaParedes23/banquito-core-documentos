@@ -61,8 +61,43 @@ public class DocumentService {
         return toMetadataResponse(saved);
     }
 
+    @Transactional
+    public DocumentMetadataResponse registrarIdempotente(RegisterDocumentRequest request) {
+        if (request.businessReferenceUuid() != null && !request.businessReferenceUuid().isBlank()) {
+            return documentoRepository
+                    .findFirstByContextoNegocioAndTipoDocumentoAndUuidReferenciaNegocio(
+                            request.businessContext(),
+                            request.documentType(),
+                            request.businessReferenceUuid()
+                    )
+                    .map(this::toMetadataResponse)
+                    .orElseGet(() -> registrar(request));
+        }
+        return registrar(request);
+    }
+
     public DocumentMetadataResponse obtener(String documentUuid) {
         return toMetadataResponse(buscarDocumento(documentUuid));
+    }
+
+    @Transactional
+    public DocumentMetadataResponse asociarReferencia(String documentUuid,
+                                                       String businessReferenceUuid,
+                                                       String correlationId) {
+        Documento documento = buscarDocumento(documentUuid);
+        documento.setUuidReferenciaNegocio(businessReferenceUuid);
+        if (correlationId != null && !correlationId.isBlank()) {
+            documento.setCorrelationId(correlationId);
+        }
+        Documento saved = documentoRepository.save(documento);
+        eventoRepository.save(DocumentoEvento.crear(
+                documentUuid,
+                TipoEventoDocumentoEnum.REFERENCIA_ASOCIADA,
+                "Referencia de negocio asociada",
+                "document-service",
+                correlationId
+        ));
+        return toMetadataResponse(saved);
     }
 
     public List<DocumentMetadataResponse> buscar(String context, String type, String businessReferenceUuid) {

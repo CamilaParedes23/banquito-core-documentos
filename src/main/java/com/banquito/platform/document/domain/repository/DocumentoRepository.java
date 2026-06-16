@@ -7,5 +7,10 @@ import java.util.Optional;
 
 public interface DocumentoRepository extends MongoRepository<Documento, String> {
     Optional<Documento> findByUuidDocumento(String uuidDocumento);
+    Optional<Documento> findFirstByContextoNegocioAndTipoDocumentoAndUuidReferenciaNegocio(
+            String contextoNegocio,
+            String tipoDocumento,
+            String uuidReferenciaNegocio
+    );
     boolean existsByUuidDocumento(String uuidDocumento);
 }

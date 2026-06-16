@@ -4,12 +4,14 @@ import com.banquito.platform.document.api.dto.api.*;
 import com.banquito.platform.document.application.service.DocumentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/documents")
+@PreAuthorize("hasAnyRole('ADMIN_SEGURIDAD', 'OPERADOR_CONTABLE') or hasAuthority('SCOPE_document.create')")
 public class DocumentController {
     private final DocumentService documentService;
 

@@ -44,6 +44,8 @@ GET  /api/v1/documents/{documentUuid}/versions
 
 POST /api/v1/documents/{documentUuid}/events
 GET  /api/v1/documents/{documentUuid}/events
+
+POST /internal/v1/documents  # uso interno protegido
 ```
 
 ## OpenAPI
@@ -72,9 +74,6 @@ JWT_ISSUER
 JWT_SECRET
 DOCUMENT_DEMO_ENABLED
 DOCUMENT_GRPC_PORT
-DOCUMENT_RABBITMQ_ENABLED
-BANQUITO_EVENTS_EXCHANGE
-DOCUMENT_QUEUE
 DOCUMENT_STORAGE_MODE
 ```
 
@@ -89,6 +88,22 @@ docker run --rm -p 8086:8086 --env-file .env.example banquito/document-service:l
 ## Notas de arquitectura
 
 - REST/OpenAPI se expone hacia Kong para consumo externo entre sistemas.
-- gRPC queda como contrato interno para comunicación dentro del mismo ecosistema cuando aplique.
-- RabbitMQ será usado posteriormente para registrar evidencias de forma asíncrona ante eventos como `document.requested`, `accounting.eod.completed`, `notification.sent`, etc.
+- gRPC es el contrato interno activo para comunicación entre microservicios del ecosistema.
+- La integración actual usa gRPC interno protegido por metadata y el outbox programado del microservicio productor. RabbitMQ no forma parte del Core en esta fase.
 - MongoDB guarda documentos operativos y evidencias, no saldos ni datos maestros bancarios.
+
+## Seguridad y autorización agregada
+
+Los endpoints documentales quedan restringidos a roles internos o clientes técnicos con scope `document.create`. Los clientes finales no deben consultar documentos de otros contextos directamente; el acceso debe pasar por el microservicio dueño del proceso de negocio.
+
+
+
+## Registro idempotente de evidencias internas
+
+La comunicación activa desde `core-account-service` usa `DocumentQueryService/RegisterDocument` por gRPC en el puerto `9096`, protegida mediante metadata `x-internal-service-key`.
+
+`POST /internal/v1/documents` se conserva temporalmente como compatibilidad técnica, sin consumidores en Account, hasta completar la prueba de regresión y su posterior retiro controlado.
+
+La combinación `businessContext + documentType + businessReferenceUuid` identifica una evidencia de negocio. Reintentar el mismo evento devuelve el documento ya registrado y evita duplicados en MongoDB.
+
+En esta fase se almacena una representación canónica JSON del comprobante. El PDF visual que genera el frontend puede seguir descargándose sin obligar a persistir cada exportación del usuario.

@@ -23,6 +23,9 @@ message RegisterDocumentRequest {
   string hash_sha256 = 7;
   string created_by = 8;
   string correlation_id = 9;
+  string content_base64 = 10;
+  string text_payload = 11;
+  string metadata_json = 12;
 }
 
 message GetDocumentMetadataRequest {
@@ -36,6 +39,8 @@ message RegisterDocumentVersionRequest {
   string storage_path = 4;
   string hash_sha256 = 5;
   string created_by = 6;
+  string content_base64 = 7;
+  string text_payload = 8;
 }
 
 message AttachDocumentRequest {
@@ -54,6 +59,10 @@ message DocumentMetadataResponse {
   string storage_path = 7;
   string hash_sha256 = 8;
   string status = 9;
+  string created_at = 10;
+  string created_by = 11;
+  string correlation_id = 12;
+  string metadata_json = 13;
 }
 
 message DocumentVersionResponse {
@@ -61,4 +70,10 @@ message DocumentVersionResponse {
   string document_uuid = 2;
   int32 version_number = 3;
   string status = 4;
+  string file_name = 5;
+  string mime_type = 6;
+  string storage_path = 7;
+  string hash_sha256 = 8;
+  string created_at = 9;
+  string created_by = 10;
 }

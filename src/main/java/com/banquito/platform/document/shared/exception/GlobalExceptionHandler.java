@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,6 +45,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(error("DOCUMENT_DATA_INTEGRITY_ERROR", "No se pudo registrar el documento por una restricción de datos o de esquema documental", List.of(ex.getMostSpecificCause().getMessage())));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(error("SECURITY_ACCESS_DENIED", "Acceso denegado. El token no posee permisos para este recurso.", List.of()));
     }
 
     @ExceptionHandler(Exception.class)

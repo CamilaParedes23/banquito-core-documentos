@@ -22,17 +22,14 @@ logging:
     com.banquito.platform.document: ${LOG_LEVEL_APP:INFO}
 
 banquito:
+  internal:
+    service-key: ${INTERNAL_SERVICE_KEY:BanQuitoInternalServiceKey2026ChangeMe}
   security:
     jwt:
       issuer: ${JWT_ISSUER:banquito-identity-access}
       secret: ${JWT_SECRET:BanQuitoIdentityJwtSecretKeyForDevelopmentOnlyChangeMe2026}
   demo:
     enabled: ${DOCUMENT_DEMO_ENABLED:true}
-  messaging:
-    rabbitmq:
-      enabled: ${DOCUMENT_RABBITMQ_ENABLED:false}
-      exchange: ${BANQUITO_EVENTS_EXCHANGE:banquito.events.exchange}
-      documentQueue: ${DOCUMENT_QUEUE:document.queue}
   grpc:
     server:
       port: ${DOCUMENT_GRPC_PORT:9096}
